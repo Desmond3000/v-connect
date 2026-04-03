@@ -1,9 +1,10 @@
 <template>
+  <img src="@/assets/backgroundVcon.png" alt="Vcon Background" class="bg-image"/>
   <div class="page">
 
     <div class="container">
-      <div class="panel">
-        <img src="@/assets/v-connect.png" alt="vcunt logo" class="logo" />
+       <img src="@/assets/v-connect.png" alt="vcunt logo" class="logo" />
+      <div class="glass-panel">
         <h1 class="title">SIGN UP</h1>
         <p class="error-txt" v-if="errorMessage">{{ errorMessage }}</p>
 
@@ -72,17 +73,18 @@ const register = async () => {
 
 <style scoped>
 .page {
-  background-color: black;
   min-height: 100vh;
   position: relative;
 }
 
 .logo {
   display: block;
-  margin: 0 auto 20px auto;
-  width: 80px;
-  height: 80px;
+  margin: 20px auto;
+  width: 100px;
+  height: 100px;
   object-fit: contain;
+  margin-bottom: 0px;
+  filter:drop-shadow(0 0 15px rgba(3, 3, 66, 0.7)); 
 }
 
 .container {
@@ -94,25 +96,42 @@ const register = async () => {
   gap: 12px;
   padding: 50px;
 }
+.glass-panel {
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 24px;
+  padding: 10px 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  width:332px;
+}
 
 .title {
   font-family: 'Planet Kosmos', sans-serif;
-  text-align: center;
+  text-align: flex-start;
   font-size: 50px;
+  margin-bottom: 0px;
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
-  width: 320px;
+  width: 250px;
+  max-width:400px;
   gap: 6px;
+  margin-left: 30px;
+  margin-right: 30px;
 }
 
 .form-group label {
   font-family: 'Cascadia Code', sans-serif;
   font-weight: 700;
-  font-size: 0.95rem;
-  margin-top: 10px;
+  font-size: 0.85rem;
+  margin-top: 7px;
   color: aliceblue;
 }
 
@@ -131,15 +150,16 @@ const register = async () => {
   border: none;
   outline: none;
   width: 100%;
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   background: transparent;
   color: #1a1a2e;
 }
 
 .btn {
-  width: 320px;
+  width: 200px;
+  max-width: 400px;
   padding: 14px;
-  background-color: #1a1a2e;
+  background-color: #b70b67;
   color: white;
   border: none;
   border-radius: 50px;
@@ -147,8 +167,8 @@ const register = async () => {
   font-weight: 700;
   letter-spacing: 2px;
   cursor: pointer;
-  margin-top: 8px;
   transition: background 0.2s;
+  margin-top: 10px;
 }
 
 .btn:hover {
@@ -157,5 +177,15 @@ const register = async () => {
 
 .register-link {
   font-size: 13px;
+}
+
+.bg-image{
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height: 100%;
+  object-fit: cover;
+  z-index:0;
 }
 </style>
