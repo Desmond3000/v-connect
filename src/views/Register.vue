@@ -1,5 +1,5 @@
 <template>
-  <img src="@/assets/backgroundVcon.png" alt="Vcon Background" class="bg-image"/>
+  <img src="@/assets/new-bg.png" alt="Vcon Background" class="bg-image"/>
   <div class="page">
 
     <div class="container">
@@ -128,7 +128,7 @@ const register = async () => {
 }
 
 .form-group label {
-  font-family: 'Cascadia Code', sans-serif;
+  font-family: 'Gil Sans MT', sans-serif;
   font-weight: 700;
   font-size: 0.85rem;
   margin-top: 7px;
@@ -141,18 +141,17 @@ const register = async () => {
   border: 1px solid #ccc;
   border-radius: 8px;
   padding: 5px 10px;
-  background: white;
   gap: 10px;
 }
 
 .input-wrapper input {
-  font-family: 'Cocogoose Classic Trial', sans-serif;
+  font-family: 'Gil Sans MT', sans-serif;
   border: none;
   outline: none;
   width: 100%;
   font-size: 0.7rem;
   background: transparent;
-  color: #1a1a2e;
+  color: #ffffff;
 }
 
 .btn {

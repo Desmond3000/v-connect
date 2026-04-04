@@ -1,5 +1,5 @@
 <template>
-      <img src="@/assets/backgroundVcon.png" alt="Vcon Background" class="bg-image"/>
+      <img src="@/assets/new-bg.png" alt="Vcon Background" class="bg-image"/>
 
   <div class="page">
     <div class="container">
@@ -90,7 +90,7 @@ const forgotPassword = () => {
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.4);
   border-radius: 24px;
-  padding: 30px 40px;
+  padding: 20px 40px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -118,7 +118,7 @@ const forgotPassword = () => {
 }
 
 .form-group label {
-  font-family: 'Cascadia Code', sans-serif;
+  font-family: 'Gil Sans MT', sans-serif;
   font-weight: 700;
   font-size: 0.85rem;
   margin-top: 7px;
@@ -131,22 +131,21 @@ const forgotPassword = () => {
   border: 1px solid #ccc;
   border-radius: 8px;
   padding: 5px 10px;
-  background: white;
   gap: 10px;
 }
 
 .input-wrapper input {
-  font-family: 'Cocogoose Classic Trial', sans-serif;
+  font-family: 'Gil Sans MT', sans-serif;
   border: none;
   outline: none;
   width: 100%;
   font-size: 0.7rem;
   background: transparent;
-  color: #1a1a2e;
+  color: #ffffff;
 }
 
 .forgot {
-  font-family: 'Cascadia Code', sans-serif;
+  font-family: 'Gil Sans MT', sans-serif;
   text-align: right;
   font-size: 0.80rem;
   color: #888;
