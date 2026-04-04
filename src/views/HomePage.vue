@@ -66,20 +66,20 @@
       </div>
     </ion-content>
 
-    <ion-tab-bar slot="bottom" class="tab-bar">
-      <ion-tab-button tab="home" href="/home">
-        <ion-icon name="grid-outline"></ion-icon>
-        <ion-label>Home</ion-label>
-      </ion-tab-button>
-      <ion-tab-button tab="profile" href="/profile">
-        <ion-icon name="person-outline"></ion-icon>
-        <ion-label>Profile</ion-label>
-      </ion-tab-button>
-      <ion-tab-button tab="listings" href="/listings">
-        <ion-icon name="list-outline"></ion-icon>
-        <ion-label>Listings</ion-label>
-      </ion-tab-button>
-    </ion-tab-bar>
+    <div class="tab-bar">
+  <div class="tab-item active" @click="goTo('/home')">
+    <ion-icon name="grid-outline"></ion-icon>
+    <span>Home</span>
+  </div>
+  <div class="tab-item" @click="goTo('/profile')">
+    <ion-icon name="person-outline"></ion-icon>
+    <span>Profile</span>
+  </div>
+  <div class="tab-item" @click="goTo('/listings')">
+    <ion-icon name="list-outline"></ion-icon>
+    <span>Listings</span>
+  </div>
+</div>
   </ion-page>
 </template>
 
@@ -87,7 +87,7 @@
 import { ref, computed } from 'vue'
 import {
   IonPage, IonContent, IonIcon,
-  IonTabBar, IonTabButton, IonLabel
+  useIonRouter,
 } from '@ionic/vue'
 import { addIcons } from 'ionicons'
 import {
@@ -104,6 +104,11 @@ addIcons({
   'car-outline': carOutline,
 })
 
+const router = useIonRouter()
+
+const goTo = (path: string) => {
+  router.push(path)
+}
 const searchQuery = ref('')
 const selectedCategory = ref('All')
 
@@ -316,7 +321,7 @@ const filteredVehicles = computed(() => {
 .pill-active {
   background: #fc89d0;
   color: #ffffff;
-  filter:drop-shadow(0 0 1.px rgba(3, 3, 66, 0.7)); 
+  filter:drop-shadow(0 0 1px rgba(3, 3, 66, 0.7)); 
 }
 
 .listings {
@@ -406,7 +411,34 @@ const filteredVehicles = computed(() => {
 }
 
 .tab-bar {
-  --background: #ffffff;
-  --border: 0.5px solid #e0e0e0;
+  position:fixed;
+  bottom:0;
+  left:0;
+  width:100%;
+  background: #ffffff;
+  border-top: 0.5px solid #e0e0e0;
+  display: flex;
+  justify-content: space-around;
+  padding: 10px 0;
+  z-index: 100;
 }
+
+.tab-item{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:4px;
+  cursor:pointer;
+  color: #888;
+  font-size: 10px;
+}
+
+.tab-item ion-icon{
+  font-size: 22px;
+}
+
+.tab-item.active{
+  color: #fc89d0;
+}
+
 </style>
