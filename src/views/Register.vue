@@ -1,6 +1,8 @@
 <template>
-  <img src="@/assets/new-bg.png" alt="Vcon Background" class="bg-image"/>
+  <ion-page>
+    <ion-content :fullscreen="true">
   <div class="page">
+      <img src="@/assets/new-bg.png" alt="Vcon Background" class="bg-image"/>
 
     <div class="container">
        <img src="@/assets/v-connect.png" alt="vcunt logo" class="logo" />
@@ -37,19 +39,28 @@
         </div>
 
         <button class="btn" @click="register">SIGN UP</button>
-        <p class="register-link">
-          <router-link to="login">Already Have an Account</router-link>
+        <p class="register-link" @click="goLogin">
+          Already Have an Account
         </p>
       </div>
     </div>
   </div>
+  </ion-content>
+  </ion-page>
 </template>
 
 <script setup>
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useIonRouter } from '@ionic/vue'
+import { IonPage, IonContent } from '@ionic/vue'
 
-const router = useRouter()
+const router = useIonRouter()
+
+const goLogin = () =>{
+  router.push('/login')
+}
+
+
 
 const username = ref('')
 const email = ref('')
@@ -67,7 +78,7 @@ const register = async () => {
     errorMessage.value = 'Passwords do not match!'
     return
   }
-
+  router.push('/home')
 }
 </script>
 
@@ -75,6 +86,7 @@ const register = async () => {
 .page {
   min-height: 100vh;
   position: relative;
+  overflow: hidden;
 }
 
 .logo {

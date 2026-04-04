@@ -1,7 +1,8 @@
 <template>
-      <img src="@/assets/new-bg.png" alt="Vcon Background" class="bg-image"/>
-
+  <ion-page>
+    <ion-content :fullscreen="true">
   <div class="page">
+    <img src="@/assets/new-bg.png" alt="Vcon Background" class="bg-image"/>
     <div class="container">
               <img src="@/assets/v-connect.png" alt="vcunt logo" class="logo" />
       <div class="glass-panel">
@@ -26,23 +27,31 @@
         </div>
 
         <button class="btn" @click="login">LOGIN</button>
-        <p class="register-link">
-          <router-link to="/register">Create New Account</router-link>
+        <p class="register-link" @click="goRegister">
+          Create New Account
         </p>
       </div>
     </div>
   </div>
+  </ion-content>
+  </ion-page>
 </template>
 
 <script setup>
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useIonRouter } from '@ionic/vue'
+import { IonPage, IonContent } from '@ionic/vue'
 
-const router = useRouter()
+const router = useIonRouter()
 
 const email = ref('')
 const password = ref('')
 const errorMessage = ref('')
+
+const goRegister = () =>{
+  router.push('/Register')
+}
+
 
 const login = async () => {
   if (!email.value || !password.value) {
@@ -61,6 +70,7 @@ const forgotPassword = () => {
 .page {
   min-height: 100vh;
   position: relative;
+  overflow: hidden;
 }
 
 .logo {
