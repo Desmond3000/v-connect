@@ -192,8 +192,8 @@ const filteredVehicles = computed(() => {
   position:absolute;
   top: 12px;
   left: 16px;
-  width:50px;
-  height: 50px;
+  width:30px;
+  height: 30px;
   object-fit: contain;
   filter:drop-shadow(0 0 15px rgba(3, 3, 66, 0.7)); 
 }
@@ -363,6 +363,7 @@ const filteredVehicles = computed(() => {
 }
 
 .vehicle-name {
+  font-family: 'Gil Sans MT', sans-serif;
   font-size: 15px;
   font-weight: 600;
   color: #1a1a2e;
@@ -370,12 +371,14 @@ const filteredVehicles = computed(() => {
 }
 
 .vehicle-info {
+  font-family: 'Gil Sans MT', sans-serif;  
   font-size: 12px;
   color: #888;
   margin: 0 0 6px;
 }
 
 .badge-available {
+  font-family: 'Gil Sans MT', sans-serif;  
   background: #eaf3de;
   color: #3b6d11;
   font-size: 11px;
@@ -388,6 +391,7 @@ const filteredVehicles = computed(() => {
 }
 
 .price {
+  font-family: 'Gil Sans MT', sans-serif;
   font-size: 16px;
   font-weight: 700;
   color: #1a3a5c;
@@ -395,6 +399,7 @@ const filteredVehicles = computed(() => {
 }
 
 .price-label {
+  font-family: 'Gil Sans MT', sans-serif;
   font-size: 11px;
   color: #999;
   margin: 0;
