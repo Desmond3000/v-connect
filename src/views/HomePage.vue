@@ -55,10 +55,6 @@
                   <p class="vehicle-info">{{ vehicle.type }} · {{ vehicle.seats }} seats · {{ vehicle.location }}</p>
                   <span class="badge-available">Available</span>
                 </div>
-                <div class="price-box">
-                  <p class="price">Php{{ vehicle.price }}</p>
-                  <p class="price-label">/day</p>
-                </div>
               </div>
             </div>
           </div>
@@ -72,11 +68,21 @@
         <span>Home</span>
       </div>
 
+      <div class="tab-item" @click="goTo('/chat')">
+        <ion-icon name="chatbubble-outline"></ion-icon>
+        <span>Chat</span>
+      </div>
+
       <div class="tab-item" @click="goTo('/post')">
         <div class="plus-btn">
           <ion-icon name="add-outline"></ion-icon>
         </div>
         <span>Post</span>
+      </div>
+
+      <div class="tab-item" @click="goTo('/list')">
+        <ion-icon name="list-outline"></ion-icon>
+        <span>Listing</span>
       </div>
 
       <div class="tab-item" @click="goTo('/notifications')">
@@ -97,7 +103,7 @@ import {
 import { addIcons } from 'ionicons'
 import {
   searchOutline, gridOutline,
-  addCircleOutline, carOutline, addOutline, notificationsOutline
+  addCircleOutline, carOutline, addOutline, notificationsOutline, listOutline, chatbubbleOutline
 } from 'ionicons/icons'
 
 addIcons({
@@ -106,7 +112,9 @@ addIcons({
   'notif-outline': notificationsOutline,
   'add-circle-outline': addCircleOutline,
   'car-outline': carOutline,
-  'add-outline': addOutline
+  'add-outline': addOutline,
+  'list-outline': listOutline,
+  'chatbubble-outline': chatbubbleOutline
 })
 
 const router = useIonRouter()
@@ -135,7 +143,6 @@ const vehicles = ref([
     type: 'Motorcycle',
     seats: 2,
     location: 'Penafrancia',
-    price: 350,
     icon: 'car-outline',
     status: 'available'
   },
@@ -145,7 +152,6 @@ const vehicles = ref([
     type: 'Tricycle',
     seats: 6,
     location: 'Dayangdang',
-    price: 200,
     icon: 'car-outline',
     status: 'available'
   },
@@ -155,7 +161,6 @@ const vehicles = ref([
     type: 'Van',
     seats: 12,
     location: 'CBD Naga',
-    price: 1500,
     icon: 'car-outline',
     status: 'available'
   },
@@ -396,24 +401,6 @@ const filteredVehicles = computed(() => {
   border-radius: 20px;
 }
 
-.price-box {
-  text-align: right;
-}
-
-.price {
-  font-family: 'Gil Sans MT', sans-serif;
-  font-size: 16px;
-  font-weight: 700;
-  color: #1a3a5c;
-  margin: 0;
-}
-
-.price-label {
-  font-family: 'Gil Sans MT', sans-serif;
-  font-size: 11px;
-  color: #999;
-  margin: 0;
-}
 
 .tab-bar {
   position: fixed;
@@ -450,7 +437,7 @@ const filteredVehicles = computed(() => {
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: #fc89d0;
+  background: #ef70be;
   display: flex;
   align-items: center;
   justify-content: center;
