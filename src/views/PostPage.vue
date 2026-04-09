@@ -151,16 +151,15 @@ const submitPost = () => {
     !form.vehicleType ||
     !form.vehicleModel ||
     !form.seatCapacity ||
-    !form.location ||
-    !form.price ||
-    !form.availableFrom ||
-    !form.availableUntil ||
+    !form.plateNumber||
     !form.withDriver
   ) {
     errorMessage.value = 'Please fill in all fields'
     return
   }
   errorMessage.value = ''
+
+  console.log('Redirecting...')
   router.push('/listings')
 }
 </script>
