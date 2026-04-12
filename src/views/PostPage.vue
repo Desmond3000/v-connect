@@ -1,98 +1,107 @@
 <template>
   <ion-page>
     <ion-content>
-  <div class="page">
-    <img src="@/assets/new-bg.png" class="bg-image" />
+      <div class="page">
+        <!--Background for mobile-->
+        <img src="@/assets/new-bg.png" class="bg-mobile" />
 
-    <div class="container">
+        <!--Background for web-->
+        <img src="@/assets/new-bg.png" class="bg-web" />
+        <div class="container">
 
-      <!-- Header -->
-      <div class="post-header">
-        <div class="back-btn" @click="goBack">
-          <ion-icon name="arrow-back-outline"></ion-icon>
-        </div>
-        <h1 class="header-title">Post a Vehicle</h1>
-      </div>
-
-      <!-- Form -->
-      <div class="form-card">
-
-        <!-- Photo Upload -->
-        <div class="photo-upload" @click="triggerUpload">
-          <input type="file" ref="fileInput" accept="image/*" @change="handlePhoto" style="display:none" />
-          <div v-if="!photoPreview" class="upload-placeholder">
-            <ion-icon name="camera-outline" class="camera-icon"></ion-icon>
-            <p>Tap to upload vehicle photo</p>
+          <!-- Header -->
+          <div class="post-header">
+            <div class="back-btn" @click="goBack">
+              <ion-icon name="arrow-back-outline"></ion-icon>
+            </div>
+            <h1 class="header-title">Post a Vehicle</h1>
           </div>
-          <img v-else :src="photoPreview" class="photo-preview" />
-        </div>
 
-        <!-- Vehicle Type -->
-        <div class="form-group">
-          <label>Vehicle Type</label>
-          <select v-model="form.vehicleType" class="input-field">
-            <option value="" disabled>Select type</option>
-            <option>Tricycle</option>
-            <option>Motorcycle</option>
-            <option>Car</option>
-            <option>Van</option>
-          </select>
-        </div>
+          <!-- Form -->
+          <div class="form-card">
 
-        <!-- Vehicle Model -->
-        <div class="form-group">
-          <label>Vehicle Model</label>
-          <input type="text" placeholder="e.g. Toyota Vios 2022" v-model="form.vehicleModel" class="input-field" />
-        </div>
 
-        <div class="form-group">
-          <label>Vehicle Color</label>
-          <input type="text" placeholder="e.g. White" v-model="form.vehicleColor" class="input-field" />
-        </div>
-
-        <!-- Seat Capacity -->
-        <div class="form-group">
-          <label>Seat Capacity</label>
-          <input type="number" placeholder="e.g. 5" v-model="form.seatCapacity" class="input-field" />
-        </div>
-
-        <!-- Location: FOREIGN KEY: Owner_Account_ID -->
-
-        <!-- Seat Capacity -->
-        <div class="form-group">
-          <label>Plate Number</label>
-          <input type="text" placeholder="Enter registered plate number" v-model="form.plateNumber" class="input-field" />
-        </div>
-
-        <!-- With/Without Driver -->
-        <div class="form-group">
-          <label>Driver Option</label>
-          <div class="driver-options">
-            <div :class="['driver-btn', form.withDriver === 'with' ? 'driver-active' : '']"
-              @click="form.withDriver = 'with'">
-              With Driver
+            <!-- Vehicle Type -->
+            <div class="form-group">
+              <label>Vehicle Type</label>
+              <select v-model="form.vehicleType" class="input-field">
+                <option value="" disabled>Select type</option>
+                <option>Tricycle</option>
+                <option>Motorcycle</option>
+                <option>Car</option>
+                <option>Van</option>
+              </select>
             </div>
-            <div :class="['driver-btn', form.withDriver === 'without' ? 'driver-active' : '']"
-              @click="form.withDriver = 'without'">
-              Without Driver
+
+            <!-- Vehicle Model -->
+            <div class="form-group">
+              <label>Vehicle Model</label>
+              <input type="text" placeholder="e.g. Toyota Vios 2022" v-model="form.vehicleModel" class="input-field" />
             </div>
-            <div :class="['driver-btn', form.withDriver === 'both' ? 'driver-active' : '']"
-              @click="form.withDriver = 'both'">
-              Both
+
+            <div class="form-group">
+              <label>Vehicle Color</label>
+              <input type="text" placeholder="e.g. White" v-model="form.vehicleColor" class="input-field" />
             </div>
+
+            <!-- Seat Capacity -->
+            <div class="form-group">
+              <label>Seat Capacity</label>
+              <input type="number" placeholder="e.g. 5" v-model="form.seatCapacity" class="input-field" />
+            </div>
+
+            <!-- Location: FOREIGN KEY: Owner_Account_ID -->
+
+            <!-- Plate Number -->
+            <div class="form-group">
+              <label>Plate Number</label>
+              <input type="text" placeholder="Enter registered plate number" v-model="form.plateNumber"
+                class="input-field" />
+            </div>
+
+            <!-- Registration Date -->
+            <div class="form-group">
+              <label>Registration Date</label>
+              <input type="date" placeholder="Enter registration date" v-model="form.registrationDate"
+                class="input-field" />
+            </div>
+
+            <!-- Fuel Type -->
+            <div class="form-group">
+              <label>Fuel Type (Optional)</label>
+              <input type="text" placeholder="e.g., Petron" v-model="form.fuelType" class="input-field" />
+            </div>
+
+            <!-- With/Without Driver -->
+            <div class="form-group">
+              <label>Driver Option</label>
+              <div class="driver-options">
+                <div :class="['driver-btn', form.withDriver === 'with' ? 'driver-active' : '']"
+                  @click="form.withDriver = 'with'">
+                  With Driver
+                </div>
+                <div :class="['driver-btn', form.withDriver === 'without' ? 'driver-active' : '']"
+                  @click="form.withDriver = 'without'">
+                  Without Driver
+                </div>
+                <div :class="['driver-btn', form.withDriver === 'both' ? 'driver-active' : '']"
+                  @click="form.withDriver = 'both'">
+                  Both
+                </div>
+              </div>
+            </div>
+
+            <!-- Error Message -->
+            <p class="error-txt" v-if="errorMessage">{{ errorMessage }}</p>
+
+            <!-- Submit Button -->
+            <button class="btn" @click="submitPost" :disabled="isLoading">{{ isLoading ? 'Posting...' : 'Post Vehicle'
+              }}</button>
+
           </div>
         </div>
-
-        <!-- Error Message -->
-        <p class="error-txt" v-if="errorMessage">{{ errorMessage }}</p>
-
-        <!-- Submit Button -->
-        <button class="btn" @click="submitPost">POST VEHICLE</button>
-
       </div>
-    </div>
-  </div>
-  </ion-content>
+    </ion-content>
   </ion-page>
 </template>
 
@@ -100,67 +109,74 @@
 import { ref, reactive } from 'vue'
 import { useIonRouter, IonIcon, IonPage, IonContent } from '@ionic/vue'
 import { addIcons } from 'ionicons'
-import {
-  arrowBackOutline,
-  cameraOutline
-} from 'ionicons/icons'
-
+import { arrowBackOutline } from 'ionicons/icons'
+import { vehicleAPI } from '@/api'
 addIcons({
   'arrow-back-outline': arrowBackOutline,
-  'camera-outline': cameraOutline
 })
 
 const router = useIonRouter()
 
-const fileInput = ref(null)
-const photoPreview = ref(null)
 const errorMessage = ref('')
+
+const isLoading = ref(false)
 
 const form = reactive({
   vehicleType: '',
   vehicleModel: '',
+  vehicleColor: '',
   seatCapacity: '',
-  location: '',
-  price: '',
-  availableFrom: '',
-  availableUntil: '',
-  withDriver: ''
+  plateNumber: '',
+  withDriver: '',
 })
 
 const goBack = () => {
   router.back()
 }
 
-const triggerUpload = () => {
-  fileInput.value.click()
-}
-
-const handlePhoto = (event) => {
-  const file = event.target.files[0]
-  if (file) {
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      photoPreview.value = e.target.result
-    }
-    reader.readAsDataURL(file)
-  }
-}
-
-const submitPost = () => {
+const submitPost = async () => {
   if (
     !form.vehicleType ||
     !form.vehicleModel ||
+    !form.vehicleColor ||
     !form.seatCapacity ||
-    !form.plateNumber||
+    !form.plateNumber ||
+    !form.registrationDate ||
     !form.withDriver
   ) {
     errorMessage.value = 'Please fill in all fields'
     return
   }
+  isLoading.value = true
   errorMessage.value = ''
-
-  console.log('Redirecting...')
-  router.push('/listings')
+  try {
+    await vehicleAPI.post({
+      vehicle_type: form.vehicleType,
+      vehicle_model: form.vehicleModel,
+      vehicle_color: form.vehicleColor,
+      seat_capacity: Number(form.seatCapacity),
+      daily_rate: 0,
+      plate_number: form.plateNumber,
+      registration_date: form.registrationDate,
+      fuel_type: form.fuelType || null
+    })
+    console.log('Redirecting...')
+    router.push('/listings')
+  }
+  catch (err) {
+    if (err.response?.status === 403) {
+      errorMessage.value = "Driver's license is required to list a vehicle"
+    }
+    else if (err.response?.data?.message) {
+      errorMessage.value = err.response.data.message
+    }
+    else {
+      errorMessage.value = 'Failed to post vehicle. Try again.'
+    }
+  }
+  finally {
+    isLoading.value = false
+  }
 }
 </script>
 
@@ -172,7 +188,8 @@ const submitPost = () => {
   padding-bottom: 40px;
 }
 
-.bg-image {
+.bg-mobile {
+  display: block;
   position: absolute;
   top: 0;
   left: 0;
@@ -181,6 +198,28 @@ const submitPost = () => {
   object-fit: cover;
   z-index: 0;
   opacity: 0.9;
+}
+
+.bg-web {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+  opacity: 0.9;
+}
+
+@media(min-width: 768px) {
+  .bg-mobile {
+    display: none;
+  }
+
+  .bg-web {
+    display: block;
+  }
 }
 
 .container {
@@ -227,40 +266,6 @@ const submitPost = () => {
   display: flex;
   flex-direction: column;
   gap: 14px;
-}
-
-.photo-upload {
-  border: 2px dashed rgba(255, 255, 255, 0.5);
-  border-radius: 14px;
-  height: 160px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  overflow: hidden;
-}
-
-.upload-placeholder {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.camera-icon {
-  font-size: 36px;
-}
-
-.upload-placeholder p {
-  font-size: 13px;
-  margin: 0;
-}
-
-.photo-preview {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
 }
 
 .form-group {

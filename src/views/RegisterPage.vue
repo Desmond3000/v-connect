@@ -2,8 +2,8 @@
   <ion-page>
     <ion-content :fullscreen="true">
   <div class="page">
-      <img src="@/assets/new-bg.png" alt="Vcon Background" class="bg-image"/>
-
+      <img src="@/assets/new-bg.png" alt="Vcon Background" class="bg-mobile"/>
+      <img src="@/assets/v-connect-bg-web.png" alt="Vcon Background" class="bg-web"/>
     <div class="container">
        <img src="@/assets/v-connect.png" alt="vcunt logo" class="logo" />
       <div class="glass-panel">
@@ -21,6 +21,27 @@
           <label>Email</label>
           <div class="input-wrapper">
             <input type="text" placeholder="Enter Email" v-model="email">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>contact_number</label>
+          <div class="input-wrapper">
+            <input type="text" placeholder="Enter Contact Number" v-model="contact_number">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Address</label>
+          <div class="input-wrapper">
+            <input type="text" placeholder="Enter Home Address" v-model="address">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Drivers License</label>
+          <div class="input-wrapper">
+            <input type="text" placeholder="Enter Driver's License" v-model="drivers_license">
           </div>
         </div>
 
@@ -53,10 +74,11 @@
 import { ref } from 'vue'
 import { useIonRouter } from '@ionic/vue'
 import { IonPage, IonContent } from '@ionic/vue'
+import axios from 'axios'
 
 const router = useIonRouter()
 
-const goLogin = () =>{
+const goLogin = () => {
   router.push('/login')
 }
 
@@ -67,9 +89,12 @@ const email = ref('')
 const password = ref('')
 const confirmpassword = ref('')
 const errorMessage = ref('')
+const address = ref('')
+const contact_number = ref('')
+const drivers_license = ref('')
 
 const register = async () => {
-  if (!username.value || !email.value || !password.value || !confirmpassword.value) {
+  if (!username.value || !email.value || !password.value || !confirmpassword.value || !address.value || !contact_number.value || !drivers_license.value) {
     errorMessage.value = 'Fill in all fields'
     return
   }
@@ -78,8 +103,23 @@ const register = async () => {
     errorMessage.value = 'Passwords do not match!'
     return
   }
-  router.push('/home')
-}
+
+  try{
+    await axios.post('http://localhost:3000/api/auth/register',{
+      name: username.value,
+      email: email.value,
+      contact_number: contact_number.value,
+      address: address.value,
+      drivers_license: drivers_license.value,
+      password: password.value
+      })
+
+
+    router.push('/login')
+  } catch(err){
+    errorMessage.value=err.response?.data?.message || 'Registration failed.'
+  }
+  }
 </script>
 
 <style scoped>
@@ -87,6 +127,38 @@ const register = async () => {
   min-height: 100vh;
   position: relative;
   overflow: hidden;
+}
+
+.bg-mobile{
+  display:block;
+  position:absolute;
+  top: 0;
+  left:0;
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+.bg-web{
+  display:none;
+  position:absolute;
+  top: 0;
+  left:0;
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+@media (min-width: 768px){
+  .bg-mobile{
+    display:none;
+  }
+
+  .bg-web{
+    display: block;
+  }
 }
 
 .logo {

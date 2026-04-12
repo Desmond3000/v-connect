@@ -1,39 +1,40 @@
 <template>
   <ion-page>
     <ion-content :fullscreen="true">
-  <div class="page">
-    <img src="@/assets/new-bg.png" alt="Vcon Background" class="bg-image"/>
-    <div class="container">
-              <img src="@/assets/v-connect.png" alt="vcunt logo" class="logo" />
-      <div class="glass-panel">
+      <div class="page">
+        <img src="@/assets/new-bg.png" alt="Vcon Background" class="bg-mobile" />
+        <img src="@/assets/v-connect-bg-web.png" class="bg-web" />
+        <div class="container">
+          <img src="@/assets/v-connect.png" alt="vcunt logo" class="logo" />
+          <div class="glass-panel">
 
-        <h1 class="title">LOGIN</h1>
-        <p class="error-txt" v-if="errorMessage">{{ errorMessage }}</p>
+            <h1 class="title">LOGIN</h1>
+            <p class="error-txt" v-if="errorMessage">{{ errorMessage }}</p>
 
-        <!--Email-->
-        <div class="form-group">
-          <label>Email</label>
-          <div class="input-wrapper">
-            <input type="text" placeholder="Enter Email" v-model="email" />
+            <!--Email-->
+            <div class="form-group">
+              <label>Email</label>
+              <div class="input-wrapper">
+                <input type="text" placeholder="Enter Email" v-model="email" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Password</label>
+              <div class="input-wrapper">
+                <input type="password" placeholder="Enter Password" v-model="password" />
+              </div>
+              <p class="forgot" @click="forgotPassword">Forgot Password</p>
+            </div>
+
+            <button class="btn" @click="login">LOGIN</button>
+            <p class="register-link" @click="goRegister">
+              Create New Account
+            </p>
           </div>
         </div>
-
-        <div class="form-group">
-          <label>Password</label>
-          <div class="input-wrapper">
-            <input type="password" placeholder="Enter Password" v-model="password" />
-          </div>
-          <p class="forgot" @click="forgotPassword">Forgot Password</p>
-        </div>
-
-        <button class="btn" @click="login">LOGIN</button>
-        <p class="register-link" @click="goRegister">
-          Create New Account
-        </p>
       </div>
-    </div>
-  </div>
-  </ion-content>
+    </ion-content>
   </ion-page>
 </template>
 
@@ -41,6 +42,7 @@
 import { ref } from 'vue'
 import { useIonRouter } from '@ionic/vue'
 import { IonPage, IonContent } from '@ionic/vue'
+import axios from 'axios'
 
 const router = useIonRouter()
 
@@ -48,17 +50,31 @@ const email = ref('')
 const password = ref('')
 const errorMessage = ref('')
 
-const goRegister = () =>{
+const goRegister = () => {
   router.push('/Register')
 }
 
-
 const login = async () => {
   if (!email.value || !password.value) {
-    errorMessage.value = 'Please fill in all fields'
+    errorMessage.value = 'Please enter both email and password.'
     return
   }
-  router.push('/home')
+
+  try {
+    const res = await axios.post('http://localhost:3000/api/auth/login', {
+      email: email.value,
+      password: password.value
+    })
+
+    // Save JWT token //READ THIS PLEASE
+    localStorage.setItem('token', res.data.data.token)
+    localStorage.setItem('user', JSON.stringify(res.data.data))
+
+    // Redirect to home
+    router.push('/home')
+  } catch (err) {
+    errorMessage.value = err.response?.data?.message || 'Login failed.'
+  }
 }
 
 const forgotPassword = () => {
@@ -73,6 +89,38 @@ const forgotPassword = () => {
   overflow: hidden;
 }
 
+.bg-mobile {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+.bg-web {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+@media (min-width: 768px) {
+  .bg-mobile {
+    display: none;
+  }
+
+  .bg-web {
+    display: block;
+  }
+}
+
 .logo {
   display: block;
   margin: 20px auto;
@@ -80,7 +128,7 @@ const forgotPassword = () => {
   height: 100px;
   object-fit: contain;
   margin-bottom: 0px;
-  filter:drop-shadow(0 0 15px rgba(3, 3, 66, 0.7)); 
+  filter: drop-shadow(0 0 15px rgba(3, 3, 66, 0.7));
 }
 
 .container {
@@ -105,7 +153,7 @@ const forgotPassword = () => {
   flex-direction: column;
   align-items: center;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-  width:600px;
+  width: 600px;
   max-width: 95%;
 
 }
@@ -121,7 +169,7 @@ const forgotPassword = () => {
   display: flex;
   flex-direction: column;
   width: 250px;
-  max-width:400px;
+  max-width: 400px;
   gap: 6px;
   margin-left: 30px;
   margin-right: 30px;
@@ -190,13 +238,13 @@ const forgotPassword = () => {
   font-size: 13px;
 }
 
-.bg-image{
-  position:absolute;
-  top:0;
-  left:0;
-  width:100%;
+.bg-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
   height: 100%;
   object-fit: cover;
-  z-index:0;
+  z-index: 0;
 }
 </style>

@@ -2,6 +2,7 @@
   <ion-page>
     <ion-content :fullscreen="true">
       <div class="page">
+        
         <!--This is the top portion of the application :DDDDD -->
         <div class="header">
           <img src="@/assets/giphy.gif" alt="header-bg" class="backgroundHeader">
@@ -9,10 +10,31 @@
           <div class="header-top">
             <div class="greeting">
               <p class="greeting-sub">Good Day!</p>
-              <p class="greeting-name">Miss Tokneneng</p> <!--Need to change to the actual username-->
+              <p class="greeting-name">{{ userName }}</p> 
             </div>
-            <div class="avatar">MT</div> <!--should be clickable-->
-          </div>
+          
+          <!--HEADER AVATAR-->
+          <div class="avatar-wrapper">  
+            <div class="avatar" @click="toggleMenu">{{ userInitials }}</div> <!--should be clickable-->
+            <div class="dropdown-menu" v-if="showMenu">
+              <div class="dropdown-item" @click="goToProfile">
+                <ion-icon name="person-outline"></ion-icon>
+                <span>Profile</span>
+              </div>
+              <div class="dropdown-item" @click="goToSettings">
+                <ion-icon name="settings-outline"></ion-icon>
+                <span>Settings</span>
+              </div>
+              <div class="dropdown-divider"></div>
+              <div class="dropdown-item" @click="logout">
+                <ion-icon name="log-out-outline"></ion-icon>
+                <span>Logout</span>
+              </div>
+            </div>
+          </div>  
+          
+        
+        </div>
 
           <div class="search-bar"> <!--should be clickable-->
             <ion-icon name="search-outline" class="search-icon"></ion-icon>
@@ -40,20 +62,29 @@
           <span v-for="cat in categories" :key="cat" :class="['pill', selectedCategory === cat ? 'pill-active' : '']"
             @click="selectedCategory = cat">{{ cat }}</span>
         </div>
+        
+        <div v-if="isLoading" class="listings">
+          <p class="section-title">Loading vehicles...</p>
+        </div>
+
+        <div v-else-if="filteredVehicles.length === 0" class="listings">
+          <p class="section-title">No vehicles available</p>
+        </div>
 
         <!--VEHICLE LISTING-->
-        <div class="listings">
+        <div class="listings" v-else>
           <p class="section-title">Available near you</p>
-          <div v-for="vehicle in filteredVehicles" :key="vehicle.id" class="vehicle-card">
+          <div v-for="vehicle in filteredVehicles" :key="vehicle.Vehicle_ID" class="vehicle-card">
+            
             <div class="card-image">
-              <ion-icon :name="vehicle.icon" class="vehicle-icon"></ion-icon>
+              <ion-icon name="car-outline" class="vehicle-icon"></ion-icon>
             </div>
             <div class="card-body">
               <div class="card-row">
                 <div>
-                  <p class="vehicle-name">{{ vehicle.name }}</p>
-                  <p class="vehicle-info">{{ vehicle.type }} · {{ vehicle.seats }} seats · {{ vehicle.location }}</p>
-                  <span class="badge-available">Available</span>
+                  <p class="vehicle-name">{{ vehicle.Vehicle_Model }}</p>
+                  <p class="vehicle-info">{{ vehicle.Vehicle_Type }} · {{ vehicle.Seat_Capacity }} seats · {{ vehicle.Owner_Address || 'Naga City' }}</p>
+                  <span class="badge-available">{{ vehicle.Vehicle_Status }}</span>
                 </div>
               </div>
             </div>
@@ -80,13 +111,13 @@
         <span>Post</span>
       </div>
 
-      <div class="tab-item" @click="goTo('/list')">
+      <div class="tab-item" @click="goTo('/listings')">
         <ion-icon name="list-outline"></ion-icon>
         <span>Listing</span>
       </div>
 
       <div class="tab-item" @click="goTo('/notifications')">
-        <ion-icon name="notif-outline"></ion-icon>
+        <ion-icon name="notifications-outline"></ion-icon>
         <span>Alerts</span>
       </div>
 
@@ -95,86 +126,124 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import {
   IonPage, IonContent, IonIcon,
-  useIonRouter,
+  useIonRouter, onIonViewWillEnter
 } from '@ionic/vue'
 import { addIcons } from 'ionicons'
 import {
   searchOutline, gridOutline,
-  addCircleOutline, carOutline, addOutline, notificationsOutline, listOutline, chatbubbleOutline
+  addCircleOutline, carOutline, addOutline, notificationsOutline, listOutline, chatbubbleOutline,
+  personOutline, settingsOutline, logOutOutline
 } from 'ionicons/icons'
+import { vehicleAPI } from '@/api'
 
 addIcons({
   'search-outline': searchOutline,
   'grid-outline': gridOutline,
-  'notif-outline': notificationsOutline,
+  'notifications-outline': notificationsOutline,
   'add-circle-outline': addCircleOutline,
   'car-outline': carOutline,
   'add-outline': addOutline,
   'list-outline': listOutline,
-  'chatbubble-outline': chatbubbleOutline
+  'chatbubble-outline': chatbubbleOutline,
+  'person-outline': personOutline,
+  'settings-outline': settingsOutline,
+  'log-out-outline': logOutOutline
 })
 
 const router = useIonRouter()
-
-const goTo = (path: string) => {
-  router.push(path)
-}
 const searchQuery = ref('')
 const selectedCategory = ref('All')
-
+const userName = ref('Guest')
+const userInitials = ref('??')
 const categories = ['All', 'Tricycle', 'Motorcycle', 'Car', 'Van']
-const vehicles = ref([
-  {
-    id: 1,
-    name: 'Toyota Vios 2022',
-    type: 'Car',
-    seats: 5,
-    location: 'Dayangdang',
-    price: 800,
-    icon: 'car-outline',
-    status: 'available'
-  },
-  {
-    id: 2,
-    name: 'Honda TMX 125',
-    type: 'Motorcycle',
-    seats: 2,
-    location: 'Penafrancia',
-    icon: 'car-outline',
-    status: 'available'
-  },
-  {
-    id: 3,
-    name: 'Tricycle',
-    type: 'Tricycle',
-    seats: 6,
-    location: 'Dayangdang',
-    icon: 'car-outline',
-    status: 'available'
-  },
-  {
-    id: 4,
-    name: 'Toyota Hi-Ace Van',
-    type: 'Van',
-    seats: 12,
-    location: 'CBD Naga',
-    icon: 'car-outline',
-    status: 'available'
-  },
-])
+const vehicles = ref([])
+const isLoading = ref(false)
 
+const loadUser = () => {
+  const savedUser = localStorage.getItem('user')
+  if (savedUser){
+    const user = JSON.parse(savedUser)
+    userName.value = user.name || 'Guest'
+
+    const names = user.name.split(' ')
+    userInitials.value = names.map((n:string) => n[0]).join('').toUpperCase().slice(0, 2)
+  }
+}
+
+const showMenu = ref(false)
+
+const toggleMenu = () => {
+  showMenu.value = !showMenu.value
+}
+
+const goToProfile =() => {
+  showMenu.value = false
+  router.push('/profile')
+}
+
+const goToSettings =() =>{
+  showMenu.value = false
+  router.push('/settings')
+}
+
+const logout = () => {
+  showMenu.value = false
+  localStorage.removeItem('token')
+  localStorage.removeItem('user')
+  router.push('/login')
+}
+
+const closeMenu = (e: Event) => {
+  const target = e.target as HTMLElement
+  if (!target.closest('.avatar-wrapper')){
+    showMenu.value = false
+  }
+}
+
+
+onIonViewWillEnter (async () => {
+  loadUser()
+  await loadVehicles()
+})
+
+onMounted(async () => {
+  loadUser()
+  await loadVehicles()
+  document.addEventListener('click', closeMenu)
+})
+
+onUnmounted (() => {
+  document.removeEventListener('click', closeMenu)
+})
+
+const loadVehicles = async () =>{
+  isLoading.value = true
+  try{
+    const response = await vehicleAPI.getAll()
+    vehicles.value = response.data.data
+    console.log('Vehicles:', vehicles.value)
+  }
+  catch(err){
+    console.error('Failed to load vehicles', err)
+  }
+  finally{
+    isLoading.value = false
+  }
+}
 const filteredVehicles = computed(() => {
-  return vehicles.value.filter(v => {
-    const matchCategory = selectedCategory.value === 'All' || v.type === selectedCategory.value
-    const matchSearch = v.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-      v.location.toLowerCase().includes(searchQuery.value.toLowerCase())
+  return vehicles.value.filter((v: any) => {
+    const matchCategory = selectedCategory.value === 'All' || v.Vehicle_Type === selectedCategory.value
+    const matchSearch = v.Vehicle_Model.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+      v.Owner_Address?.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+      v.Owner_Name?.toLowerCase().includes(searchQuery.value.toLowerCase())
     return matchCategory && matchSearch
   })
 })
 
+const goTo = (path: string) => router.push(path)
 </script>
 
 <style scoped>
@@ -188,7 +257,7 @@ const filteredVehicles = computed(() => {
   padding: 70px 16px 24px;
   position: relative;
   padding: 130px 16px 15px;
-  overflow: hidden;
+  overflow: visible;
 }
 
 
@@ -238,17 +307,68 @@ const filteredVehicles = computed(() => {
   margin: 4px 0 0;
 }
 
+.avatar-wrapper{
+  position:relative;
+  z-index: 999;
+}
+
 .avatar {
   width: 42px;
   height: 42px;
   border-radius: 50%;
-  background: #e67dca;
+  background: #b83a96;
   color: #e8f4ff;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 14px;
   font-weight: 600;
+}
+
+.dropdown-menu{
+  position: absolute;
+  top:50px;
+  right: 0;
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  min-width: 180px;
+  overflow: hidden;
+  z-index: 200;
+}
+
+.dropdown-item{
+  display: flex;
+  align-items: center;
+  gap:12px;
+  padding: 14px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #1a1a2e;
+  transition: background 0.2s;
+}
+
+.dropdown-item:hover{
+  background: #f4f6f9;
+}
+
+.dropdown-item ion-icon{
+  font-size: 18px;
+  color: #1a3a5c;
+}
+
+.dropdown-divider{
+  height: 0.5px;
+  background: #e0e0e0;
+  margin: 4px 0;
+}
+
+.dropdown-item.logout{
+  color: #a83434;
+}
+
+.dropdown-item.logout ion-icon{
+  color: #a83434;
 }
 
 .search-bar {

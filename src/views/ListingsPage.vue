@@ -46,8 +46,13 @@
           </span>
         </div>
 
+        <!-- Loading state -->
+        <div v-if="isLoading" class="empty-state">
+          <p class="empty-text">Loading your vehicles...</p>
+        </div>
+
         <!-- Empty State -->
-        <div v-if="filteredListings.length === 0" class="empty-state">
+        <div v-else-if="filteredListings.length === 0" class="empty-state">
           <ion-icon name="car-outline" class="empty-icon"></ion-icon>
           <p class="empty-text">No vehicles found</p>
           <button class="btn-post" @click="goToPost">Post a Vehicle</button>
@@ -57,15 +62,14 @@
         <div class="listings" v-else>
           <div
             v-for="vehicle in filteredListings"
-            :key="vehicle.id"
+            :key="vehicle.Vehicle_ID"
             class="vehicle-card"
           >
             <!-- Card Image -->
             <div class="card-image">
-              <ion-icon :name="getVehicleIcon(vehicle.type)" class="vehicle-icon"></ion-icon>
-              <!-- Status Badge -->
-              <span :class="['status-badge', getStatusClass(vehicle.status)]">
-                {{ vehicle.status }}
+              <ion-icon name="car-outline" class="vehicle-icon"></ion-icon>
+              <span :class="['status-badge', getStatusClass(vehicle.Vehicle_Status)]">
+                {{ vehicle.Vehicle_Status }}
               </span>
             </div>
 
@@ -73,13 +77,15 @@
             <div class="card-body">
               <div class="card-top">
                 <div>
-                  <p class="vehicle-name">{{ vehicle.name }}</p>
+                  <p class="vehicle-name">{{ vehicle.Vehicle_Model }}</p>
                   <p class="vehicle-info">
-                    {{ vehicle.type }} · {{ vehicle.seats }} seats · {{ vehicle.location }}
+                    {{ vehicle.Vehicle_Type }} · 
+                    {{ vehicle.Seat_Capacity }} seats ·
+                    {{ vehicle.Owner_Address || 'No location' }}
                   </p>
                 </div>
                 <div class="price-box">
-                  <p class="price">₱{{ vehicle.price }}</p>
+                  <p class="price">₱{{ vehicle.Daily_Rate }}</p>
                   <p class="price-label">/day</p>
                 </div>
               </div>
@@ -89,33 +95,27 @@
                 <p class="status-label-text">Status</p>
                 <div class="status-bar">
                   <div
-                    :class="['status-option', vehicle.status === 'Available' ? 'status-available-active' : '']"
-                    @click="updateStatus(vehicle.id, 'Available')"
-                  >
-                    Available
-                  </div>
+                    :class="['status-option', vehicle.Vehicle_Status === 'Available' ? 'status-available-active' : '']"
+                    @click="updateStatus(vehicle.Vehicle_ID, 'Available')"
+                  >Available</div>
                   <div
-                    :class="['status-option', vehicle.status === 'Rented' ? 'status-rented-active' : '']"
-                    @click="updateStatus(vehicle.id, 'Rented')"
-                  >
-                    Rented
-                  </div>
+                    :class="['status-option', vehicle.Vehicle_Status === 'Rented' ? 'status-rented-active' : '']"
+                    @click="updateStatus(vehicle.Vehicle_ID, 'Rented')"
+                  >Rented</div>
                   <div
-                    :class="['status-option', vehicle.status === 'Under Maintenance' ? 'status-maintenance-active' : '']"
-                    @click="updateStatus(vehicle.id, 'Under Maintenance')"
-                  >
-                    Maintenance
-                  </div>
+                    :class="['status-option', vehicle.Vehicle_Status === 'Under Maintenance' ? 'status-maintenance-active' : '']"
+                    @click="updateStatus(vehicle.Vehicle_ID, 'Under Maintenance')"
+                  >Maintenance</div>
                 </div>
               </div>
 
               <!-- Action Buttons -->
               <div class="action-row">
-                <button class="btn-edit" @click="editVehicle(vehicle.id)">
+                <button class="btn-edit" @click="editVehicle(vehicle.Vehicle_ID)">
                   <ion-icon name="create-outline"></ion-icon>
                   Edit
                 </button>
-                <button class="btn-delete" @click="deleteVehicle(vehicle.id)">
+                <button class="btn-delete" @click="deleteVehicle(vehicle.Vehicle_ID)">
                   <ion-icon name="trash-outline"></ion-icon>
                   Delete
                 </button>
@@ -127,32 +127,14 @@
       </div>
     </ion-content>
 
-    <!-- Bottom Tab Bar -->
-    <div class="tab-bar">
-      <div class="tab-item" @click="goTo('/home')">
-        <ion-icon name="grid-outline"></ion-icon>
-        <span>Home</span>
-      </div>
-      <div class="tab-item" @click="goTo('/post')">
-        <div class="plus-btn">
-          <ion-icon name="add-outline"></ion-icon>
-        </div>
-        <span>Post</span>
-      </div>
-      <div class="tab-item active" @click="goTo('/notifications')">
-        <ion-icon name="notifications-outline"></ion-icon>
-        <span>Alerts</span>
-      </div>
-    </div>
-
   </ion-page>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import {
   IonPage, IonContent, IonIcon,
-  useIonRouter
+  useIonRouter, onIonViewWillEnter
 } from '@ionic/vue'
 import { addIcons } from 'ionicons'
 import {
@@ -160,6 +142,7 @@ import {
   createOutline, trashOutline, gridOutline,
   notificationsOutline
 } from 'ionicons/icons'
+import { vehicleAPI } from '@/api'
 
 addIcons({
   'arrow-back-outline': arrowBackOutline,
@@ -172,66 +155,43 @@ addIcons({
 })
 
 const router = useIonRouter()
-
 const selectedFilter = ref('All')
 const filters = ['All', 'Available', 'Rented', 'Under Maintenance']
+const vehicles = ref([])
+const isLoading = ref(false)
 
-const vehicles = ref([
-  {
-    id: 1,
-    name: 'Toyota Vios 2022',
-    type: 'Car',
-    seats: 5,
-    location: 'Dayangdang',
-    price: 800,
-    status: 'Available'
-  },
-  {
-    id: 2,
-    name: 'Honda TMX 125',
-    type: 'Motorcycle',
-    seats: 2,
-    location: 'Penafrancia',
-    price: 350,
-    status: 'Rented'
-  },
-  {
-    id: 3,
-    name: 'Multicab Tricycle',
-    type: 'Tricycle',
-    seats: 6,
-    location: 'Dayangdang',
-    price: 200,
-    status: 'Under Maintenance'
-  },
-  {
-    id: 4,
-    name: 'Toyota Hi-Ace Van',
-    type: 'Van',
-    seats: 12,
-    location: 'CBD Naga',
-    price: 1500,
-    status: 'Available'
+onIonViewWillEnter (async () => {
+  await loadMyVehicles()
+})
+
+onMounted(async () => {
+  await loadMyVehicles()
+})
+
+const loadMyVehicles = async () => {
+  isLoading.value = true
+  try {
+    const response = await vehicleAPI.getMy()
+    vehicles.value = response.data.data
+    console.log('My Vehicles:', vehicles.value)
+  } catch (err) {
+    console.error('Failed to load listings', err)
+  } finally {
+    isLoading.value = false
   }
-])
+}
 
 const totalListings = computed(() => vehicles.value.length)
-
 const availableCount = computed(() =>
-  vehicles.value.filter(v => v.status === 'Available').length
-)
-
+  vehicles.value.filter((v: any) => v.Vehicle_Status === 'Available').length)
 const rentedCount = computed(() =>
-  vehicles.value.filter(v => v.status === 'Rented').length
-)
-
+  vehicles.value.filter((v: any) => v.Vehicle_Status === 'Rented').length)
 const maintenanceCount = computed(() =>
-  vehicles.value.filter(v => v.status === 'Under Maintenance').length
-)
+  vehicles.value.filter((v: any) => v.Vehicle_Status === 'Under Maintenance').length)
 
 const filteredListings = computed(() => {
   if (selectedFilter.value === 'All') return vehicles.value
-  return vehicles.value.filter(v => v.status === selectedFilter.value)
+  return vehicles.value.filter((v: any) => v.Vehicle_Status === selectedFilter.value)
 })
 
 const getStatusClass = (status: string) => {
@@ -240,21 +200,27 @@ const getStatusClass = (status: string) => {
   return 'badge-maintenance'
 }
 
-const getVehicleIcon = (type: string) => {
-  return 'car-outline'
+const updateStatus = async (id: string, status: string) => {
+  try {
+    await vehicleAPI.updateStatus(id, status)
+    const vehicle = vehicles.value.find((v: any) => v.Vehicle_ID === id)
+    if (vehicle) (vehicle as any).Vehicle_Status = status
+  } catch (err: any) {
+    console.error(err.response?.data?.message || 'Failed to update status')
+  }
 }
 
-const updateStatus = (id: number, status: string) => {
-  const vehicle = vehicles.value.find(v => v.id === id)
-  if (vehicle) vehicle.status = status
-}
-
-const editVehicle = (id: number) => {
+const editVehicle = (id: string) => {
   router.push('/post')
 }
 
-const deleteVehicle = (id: number) => {
-  vehicles.value = vehicles.value.filter(v => v.id !== id)
+const deleteVehicle = async (id: string) => {
+  try {
+    await vehicleAPI.delete(id)
+    vehicles.value = vehicles.value.filter((v: any) => v.Vehicle_ID !== id)
+  } catch (err: any) {
+    console.error(err.response?.data?.message || 'Cannot delete rented vehicle')
+  }
 }
 
 const goBack = () => router.push('/home')
