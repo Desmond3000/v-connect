@@ -157,7 +157,7 @@ addIcons({
 const router = useIonRouter()
 const selectedFilter = ref('All')
 const filters = ['All', 'Available', 'Rented', 'Under Maintenance']
-const vehicles = ref([])
+const vehicles = ref<any[]>([])
 const isLoading = ref(false)
 
 onIonViewWillEnter (async () => {
@@ -211,7 +211,7 @@ const updateStatus = async (id: string, status: string) => {
 }
 
 const editVehicle = (id: string) => {
-  router.push('/post')
+  router.push(`/edit-vehicle/${id}`) 
 }
 
 const deleteVehicle = async (id: string) => {

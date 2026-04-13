@@ -41,7 +41,7 @@
         <div class="form-group">
           <label>Drivers License</label>
           <div class="input-wrapper">
-            <input type="text" placeholder="Enter Driver's License" v-model="drivers_license">
+            <input type="text" placeholder="Optional - Required for renting without driver and posting vehicle" v-model="drivers_license">
           </div>
         </div>
 
@@ -94,7 +94,7 @@ const contact_number = ref('')
 const drivers_license = ref('')
 
 const register = async () => {
-  if (!username.value || !email.value || !password.value || !confirmpassword.value || !address.value || !contact_number.value || !drivers_license.value) {
+  if (!username.value || !email.value || !password.value || !confirmpassword.value || !address.value || !contact_number.value) {
     errorMessage.value = 'Fill in all fields'
     return
   }

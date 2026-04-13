@@ -31,6 +31,10 @@ const routes: Array<RouteRecordRaw> = [
     name: "listings",
     component: () => import("../views/ListingsPage.vue"),
   },
+  {
+    path: '/edit-vehicle/:id',
+    component: () => import('../views/EditPage.vue')
+  }
 ];
 
 const router = createRouter({

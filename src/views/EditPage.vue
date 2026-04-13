@@ -1,25 +1,21 @@
 <template>
   <ion-page>
-    <ion-content>
+    <ion-content :fullscreen="true">
       <div class="page">
-        <!--Background for mobile-->
         <img src="@/assets/new-bg.png" class="bg-mobile" />
-
-        <!--Background for web-->
         <img src="@/assets/new-bg.png" class="bg-web" />
-        <div class="container">
 
+        <div class="container">
           <!-- Header -->
           <div class="post-header">
             <div class="back-btn" @click="goBack">
               <ion-icon name="arrow-back-outline"></ion-icon>
             </div>
-            <h1 class="header-title">Post a Vehicle</h1>
+            <h1 class="header-title">Edit Vehicle</h1>
           </div>
 
           <!-- Form -->
           <div class="form-card">
-
 
             <!-- Vehicle Type -->
             <div class="form-group">
@@ -36,76 +32,59 @@
             <!-- Vehicle Model -->
             <div class="form-group">
               <label>Vehicle Model</label>
-              <input type="text" placeholder="e.g. Toyota Vios 2022" v-model="form.vehicleModel" class="input-field" />
+              <input type="text" placeholder="e.g. Toyota Vios 2022"
+                v-model="form.vehicleModel" class="input-field" />
             </div>
 
+            <!-- Vehicle Color -->
             <div class="form-group">
               <label>Vehicle Color</label>
-              <input type="text" placeholder="e.g. White" v-model="form.vehicleColor" class="input-field" />
+              <input type="text" placeholder="e.g. White"
+                v-model="form.vehicleColor" class="input-field" />
             </div>
 
             <!-- Seat Capacity -->
             <div class="form-group">
               <label>Seat Capacity</label>
-              <input type="number" placeholder="e.g. 5" v-model="form.seatCapacity" class="input-field" />
+              <input type="number" placeholder="e.g. 5"
+                v-model="form.seatCapacity" class="input-field" />
             </div>
 
-            <!-- Location: FOREIGN KEY: Owner_Account_ID -->
+            <!-- Daily Rate -->
+            <div class="form-group">
+              <label>Daily Rate (₱)</label>
+              <input type="number" placeholder="e.g. 800"
+                v-model="form.dailyRate" class="input-field" />
+            </div>
 
             <!-- Plate Number -->
             <div class="form-group">
               <label>Plate Number</label>
-              <input type="text" placeholder="Enter registered plate number" v-model="form.plateNumber"
-                class="input-field" />
-            </div>
-
-            <div class="form-group">
-              <label>Daily Rate (Php)</label>
-              <input
-                type="number"
-                placeholder="e.g. 800"
-                v-model="form.dailyRate"
-                class="input-field"/>
+              <input type="text" placeholder="Enter plate number"
+                v-model="form.plateNumber" class="input-field" />
             </div>
 
             <!-- Registration Date -->
             <div class="form-group">
               <label>Registration Date</label>
-              <input type="date" placeholder="Enter registration date" v-model="form.registrationDate"
+              <input type="date" v-model="form.registrationDate"
                 class="input-field" />
             </div>
 
             <!-- Fuel Type -->
             <div class="form-group">
               <label>Fuel Type (Optional)</label>
-              <input type="text" placeholder="e.g., Petron" v-model="form.fuelType" class="input-field" />
-            </div>
-
-            <!-- With/Without Driver -->
-            <div class="form-group">
-              <label>Driver Option</label>
-              <div class="driver-options">
-                <div :class="['driver-btn', form.withDriver === 'with' ? 'driver-active' : '']"
-                  @click="form.withDriver = 'with'">
-                  With Driver
-                </div>
-                <div :class="['driver-btn', form.withDriver === 'without' ? 'driver-active' : '']"
-                  @click="form.withDriver = 'without'">
-                  Without Driver
-                </div>
-                <div :class="['driver-btn', form.withDriver === 'both' ? 'driver-active' : '']"
-                  @click="form.withDriver = 'both'">
-                  Both
-                </div>
-              </div>
+              <input type="text" placeholder="e.g. Gasoline"
+                v-model="form.fuelType" class="input-field" />
             </div>
 
             <!-- Error Message -->
             <p class="error-txt" v-if="errorMessage">{{ errorMessage }}</p>
 
             <!-- Submit Button -->
-            <button class="btn" @click="submitPost" :disabled="isLoading">{{ isLoading ? 'Posting...' : 'Post Vehicle'
-              }}</button>
+            <button class="btn" @click="submitEdit" :disabled="isLoading">
+              {{ isLoading ? 'Saving...' : 'SAVE CHANGES' }}
+            </button>
 
           </div>
         </div>
@@ -115,19 +94,20 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
-import { useIonRouter, IonIcon, IonPage, IonContent } from '@ionic/vue'
+import { ref, reactive, onMounted } from 'vue'
+import { useIonRouter, IonPage, IonContent, IonIcon } from '@ionic/vue'
+import { useRoute } from 'vue-router'
 import { addIcons } from 'ionicons'
 import { arrowBackOutline } from 'ionicons/icons'
 import { vehicleAPI } from '@/api'
-addIcons({
-  'arrow-back-outline': arrowBackOutline,
-})
+
+addIcons({ 'arrow-back-outline': arrowBackOutline })
 
 const router = useIonRouter()
+const route = useRoute()
+const vehicleId = route.params.id // ← gets ID from URL
 
 const errorMessage = ref('')
-
 const isLoading = ref(false)
 
 const form = reactive({
@@ -138,32 +118,49 @@ const form = reactive({
   dailyRate: '',
   plateNumber: '',
   registrationDate: '',
-  fuelType:'',
-  withDriver: '',
+  fuelType: ''
 })
 
-const goBack = () => {
-  router.back()
-}
+// Load existing vehicle data
+onMounted(async () => {
+  try {
+    const response = await vehicleAPI.getOne(vehicleId)
+    const v = response.data.data
 
-const submitPost = async () => {
+    // Pre-fill form with existing data
+    form.vehicleType = v.Vehicle_Type
+    form.vehicleModel = v.Vehicle_Model
+    form.vehicleColor = v.Vehicle_Color
+    form.seatCapacity = v.Seat_Capacity
+    form.dailyRate = v.Daily_Rate
+    form.plateNumber = v.Plate_Number
+    form.registrationDate = v.Registration_Date?.split('T')[0] // format date
+    form.fuelType = v.Fuel_Type || ''
+  } catch (err) {
+    errorMessage.value = 'Failed to load vehicle data'
+  }
+})
+
+const goBack = () => router.back()
+
+const submitEdit = async () => {
   if (
     !form.vehicleType ||
     !form.vehicleModel ||
-    !form.vehicleColor ||
     !form.seatCapacity ||
-    !form.dailyRate === ''||
+    !form.dailyRate ||
     !form.plateNumber ||
-    !form.registrationDate ||
-    !form.withDriver
+    !form.registrationDate
   ) {
     errorMessage.value = 'Please fill in all fields'
     return
   }
+
   isLoading.value = true
   errorMessage.value = ''
+
   try {
-    await vehicleAPI.post({
+    await vehicleAPI.update(vehicleId, {
       vehicle_type: form.vehicleType,
       vehicle_model: form.vehicleModel,
       vehicle_color: form.vehicleColor,
@@ -171,25 +168,18 @@ const submitPost = async () => {
       daily_rate: Number(form.dailyRate),
       plate_number: form.plateNumber,
       registration_date: form.registrationDate,
-      fuel_type: form.fuelType || null,
-      with_driver: form.withDriver === 'with' ? 1:
-                   form.withDriver === 'without' ? 0 : 2
+      fuel_type: form.fuelType || null
     })
-    console.log('Redirecting...')
-    router.push('/listings')
-  }
-  catch (err) {
-    if (err.response?.status === 403) {
-      errorMessage.value = "Driver's license is required to list a vehicle"
-    }
-    else if (err.response?.data?.message) {
+
+    router.push('/listings') // ← redirect after saving
+
+  } catch (err) {
+    if (err.response?.data?.message) {
       errorMessage.value = err.response.data.message
+    } else {
+      errorMessage.value = 'Failed to save changes'
     }
-    else {
-      errorMessage.value = 'Failed to post vehicle. Try again.'
-    }
-  }
-  finally {
+  } finally {
     isLoading.value = false
   }
 }
@@ -228,13 +218,8 @@ const submitPost = async () => {
 }
 
 @media(min-width: 768px) {
-  .bg-mobile {
-    display: none;
-  }
-
-  .bg-web {
-    display: block;
-  }
+  .bg-mobile { display: none; }
+  .bg-web { display: block; }
 }
 
 .container {
@@ -254,7 +239,7 @@ const submitPost = async () => {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255,255,255,0.2);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -272,10 +257,10 @@ const submitPost = async () => {
 }
 
 .form-card {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255,255,255,0.15);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255,255,255,0.3);
   border-radius: 24px;
   padding: 20px 16px;
   display: flex;
@@ -297,47 +282,23 @@ const submitPost = async () => {
 }
 
 .input-field {
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.4);
   border-radius: 10px;
   padding: 10px 14px;
   font-size: 13px;
   color: #ffffff;
   outline: none;
   width: 100%;
-  font-family: 'Gil Sans MT', sans-serif;
 }
 
 .input-field::placeholder {
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255,255,255,0.5);
 }
 
 select.input-field option {
   color: #1a1a2e;
   background: #ffffff;
-}
-
-.driver-options {
-  display: flex;
-  gap: 8px;
-}
-
-.driver-btn {
-  flex: 1;
-  padding: 8px;
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 12px;
-  text-align: center;
-  cursor: pointer;
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.driver-active {
-  background: #fc89d0;
-  border-color: #fc89d0;
-  color: #ffffff;
 }
 
 .error-txt {

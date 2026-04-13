@@ -84,8 +84,13 @@
                 <div>
                   <p class="vehicle-name">{{ vehicle.Vehicle_Model }}</p>
                   <p class="vehicle-info">{{ vehicle.Vehicle_Type }} · {{ vehicle.Seat_Capacity }} seats · {{ vehicle.Owner_Address || 'Naga City' }}</p>
-                  <span class="badge-available">{{ vehicle.Vehicle_Status }}</span>
                 </div>
+              </div>
+              <div>
+                <span class="badge-available">{{ vehicle.Vehicle_Status }}</span>
+                  <button class="inquire-button" @click="inquire(vehicle)">
+                    <ion-icon name="chatbubble-outline"></ion-icon>
+                  </button>
               </div>
             </div>
           </div>
@@ -159,7 +164,7 @@ const selectedCategory = ref('All')
 const userName = ref('Guest')
 const userInitials = ref('??')
 const categories = ['All', 'Tricycle', 'Motorcycle', 'Car', 'Van']
-const vehicles = ref([])
+const vehicles = ref<any[]>([])
 const isLoading = ref(false)
 
 const loadUser = () => {
@@ -521,6 +526,14 @@ const goTo = (path: string) => router.push(path)
   border-radius: 20px;
 }
 
+.inquire-button{
+  background: transparent;
+  filter: drop-shadow(0 0 1px rgba(3, 3, 66, 0.7));
+  border-radius: 10;
+  color:#3b6d11;
+  padding-left: 94%;
+  font-size: 15px;
+}
 
 .tab-bar {
   position: fixed;
