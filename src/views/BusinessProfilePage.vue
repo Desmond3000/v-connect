@@ -222,8 +222,8 @@ async function saveProfile() {
       business_name:       biz.value.Business_Name,
       description:         biz.value.Description,
       business_address:    biz.value.Business_Address,
-      business_contactno: biz.value.Business_ContactNo,
-      business_email:      biz.value.Business_Email,
+      contact_number:      biz.value.Business_ContactNo,
+      email:               biz.value.Business_Email,
       service_area:        biz.value.Service_Area,
     })
     editMode.value = false

@@ -205,8 +205,7 @@ import {
   carOutline, logOutOutline, gridOutline,
   listOutline, addOutline
 } from 'ionicons/icons'
-import { vehicleAPI } from '@/api'
-import axios from 'axios'
+import { vehicleAPI, personAPI } from '@/api'
 
 addIcons({
   'arrow-back-outline': arrowBackOutline,
@@ -271,9 +270,7 @@ const loadMyVehicles = async () => {
 
 onIonViewWillEnter(async () => {
   try {
-    const res = await axios.get('http://localhost:3000/api/persons/me', {
-      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-    })
+    const res = await personAPI.getMe()
     const p = res.data.data
     form.value = {
       name: p.Name,
@@ -312,15 +309,12 @@ const saveProfile = async () => {
   successMessage.value = ''
 
   try {
-    const token = localStorage.getItem('token')
-    await axios.put('http://localhost:3000/api/persons/me', {
+    await personAPI.updateMe({
       name: form.value.name,
       email: form.value.email,
       contact_number: form.value.contact_number,
       address: form.value.address,
       drivers_license: form.value.drivers_license || null
-    }, {
-      headers: { Authorization: `Bearer ${token}` }
     })
 
     // Update localStorage
