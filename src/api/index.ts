@@ -100,11 +100,12 @@ export const personAPI = {
     api.get('/api/persons/me'),
 
   updateMe: (data: {
-    person_name: string         // fixed: was 'name', DB column is Person_Name
-    address: string
-    contact_number: string
-    drivers_license?: string | null
-    email?: string | null
+  name?: string
+  person_name?: string
+  address: string
+  contact_number: string
+  drivers_license?: string | null
+  email?: string | null
   }) => api.put('/api/persons/me', data),
 
   getOne: (id: string) =>
@@ -210,6 +211,16 @@ export const inquiryAPI = {
     counter_price: number,
     message?: string
   ) => api.patch(`/api/inquiries/${id}/counter`, { counter_price, message }),
+
+  ownerRespond: (
+    id: string,
+    body: {
+      decision: 'accept' | 'decline' | 'negotiate'
+      counter_price?: number
+      owner_message?: string
+    }
+  ) => api.patch(`/api/inquiries/${id}/owner-respond`, body),
+
 }
 // ── Vehicle Photos ───────────────────────────────────────
 export const vehiclePhotoAPI = {
