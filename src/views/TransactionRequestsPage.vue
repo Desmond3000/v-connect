@@ -240,7 +240,7 @@ const loadTransactions = async () => {
     // Filter to only show transactions where logged in user is the OWNER
     const user = JSON.parse(localStorage.getItem('user') || '{}')
     const all = res.data.data ?? res.data
-    transactions.value = all.filter((tx: any) => tx.Owner_Account_ID === user.Account_ID)
+    transactions.value = all.filter((tx: any) => tx.Owner_Account_ID === user.account_id)
   } catch (err) {
     console.error('Failed to load requests', err)
   } finally {
