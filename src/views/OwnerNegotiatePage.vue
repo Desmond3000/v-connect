@@ -400,7 +400,7 @@ async function acceptOffer() {
   if (!inquiry.value) return
   isActing.value = true
   try {
-    await inquiryAPI.ownerRespond(
+    await inquiryAPI.respond(
       inquiryId.value, {
         decision: 'accept',
         counter_price: Number(inquiry.value.Offered_Price)
@@ -438,7 +438,7 @@ async function declineOffer() {
   if (!inquiry.value) return
   isActing.value = true
   try {
-    await inquiryAPI.ownerRespond(inquiryId.value, {decision: 'decline'})
+    await inquiryAPI.respond(inquiryId.value, {decision: 'decline'})
 
     inquiry.value.Inquiry_Status = 'Rejected'
 
